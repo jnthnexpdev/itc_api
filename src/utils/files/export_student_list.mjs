@@ -2,16 +2,25 @@ import pdfMake from "pdfmake/build/pdfmake.js";
 import pdfFonts from "pdfmake/build/vfs_fonts.js";
 import fs from "node:fs";
 import path from "node:path";
+import { fileURLToPath } from 'url';
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const fontsDir = path.join(__dirname, '..', '..', 'assets', 'fonts');
 
-const convertImageToBase64URL = (filename, imageType = 'png') => {
+const convertImageToBase64URL = (relativePath) => {
+    const basePath = path.join(__dirname, '..', '..');
+    const imagePath = path.join(basePath, relativePath);
+
     try {
-        const buffer = fs.readFileSync(filename);
+        const buffer = fs.readFileSync(imagePath);
         const base64String = Buffer.from(buffer).toString('base64');
-        return `data:image/${imageType};base64,${base64String}`;
+        const imageExtension = path.extname(imagePath).slice(1); // Obtiene la extensión sin el punto
+        return `data:image/${imageExtension};base64,${base64String}`;
     } catch (error) {
-        throw new Error(`File ${filename} does not exist`);
+        console.error(`Error al convertir la imagen a Base64: ${error}`);
+        return ''; // O maneja el error como prefieras
     }
 };
 
@@ -20,8 +29,13 @@ function setupFonts() {
         'Montserrat-Regular.ttf', 'Montserrat-Bold.ttf', 'Montserrat-Italic.ttf', 'Montserrat-BoldItalic.ttf'
     ];
     fontFiles.forEach(font => {
-        const fontPath = path.resolve('../api_server/src/assets/fonts', font);
-        pdfMake.vfs[font] = fs.readFileSync(fontPath).toString('base64');
+        try {
+            const fontPath = path.join(fontsDir, font);
+            const fontData = fs.readFileSync(fontPath);
+            pdfMake.vfs[font] = Buffer.from(fontData).toString('base64');
+        } catch (error) {
+            console.error(`Failed to load font ${font} from path ${fontPath}: ${error.message}`);
+        }
     });
 }
 
@@ -40,8 +54,8 @@ function getHeaderAndLogos(subject, teacher, group, unit) {
     return [
         {
             columns: [
-                { image: convertImageToBase64URL('../api_server/src/assets/tnm_logo.png'), fit: [100, 100] },
-                { image: convertImageToBase64URL('../api_server/src/assets/itc.png'), fit: [60, 100], alignment: 'right' }
+                { image: convertImageToBase64URL('./assets/tnm_logo.png'), fit: [100, 100] },
+                { image: convertImageToBase64URL('./assets/itc.png'), fit: [60, 100], alignment: 'right' }
             ]
         },
         { text: 'INSTITUTO TECNOLOGICO DE CUAUTLA', style: 'mainHeader' },

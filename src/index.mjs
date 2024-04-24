@@ -21,11 +21,11 @@ app.use(bodyParser.urlencoded({limit: '5mb', extended : true}));
 app.use(bodyParser.json());
 
 //Cors 
-app.use(cors({origin : allowedOrigins[0], credentials : true}));
+app.use(cors({origin : allowedOrigins[1], credentials : true}));
 
 //Headers settings
 app.use(function (req, res, next) {
-    res.header("Access-Control-Allow-Origin", allowedOrigins[0]);
+    res.header("Access-Control-Allow-Origin", allowedOrigins[1]);
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, PATCH, DELETE");
     next();
