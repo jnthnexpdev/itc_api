@@ -11,6 +11,7 @@ const router = express.Router();
 
 router.use(cookieParser(secret));
 router.post('/login', controllers.loginUser);
+router.get('/logout', controllers.logOutUser);
 router.post('/access-code/generate', controllers.generateAccessCode);
 router.post('/access-code/validate', controllers.validateAccessCode);
 router.get('/account-type', authToken(), controllers.identifyUserType);

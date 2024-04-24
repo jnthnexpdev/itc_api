@@ -47,6 +47,18 @@ export const loginUser = async(req, res) => {
     }
 };
 
+export const logOutUser = async(req, res) => {
+    try{
+        res.cookie('session', '', {expires: new Date(0)});
+        return res.status(200).json({
+            success : true,
+            message : 'Sesion cerrada'
+        });
+    }catch(error){
+        handleServerError(res, error);
+    }
+};
+
 export const generateAccessCode = async(req, res) => {
     try{
         const email = req.body.correo;
