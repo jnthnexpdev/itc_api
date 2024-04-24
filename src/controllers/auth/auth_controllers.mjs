@@ -26,6 +26,9 @@ export const loginUser = async(req, res) => {
             res.cookie('session', token, {
                 httpOnly : false,
                 signed : true,
+                sameSite : 'None',
+                path: '/',
+                secure: false,
             });
 
             return res.status(200).json({
