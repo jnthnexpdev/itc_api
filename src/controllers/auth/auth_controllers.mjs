@@ -24,11 +24,11 @@ export const loginUser = async(req, res) => {
             const { token } = await userUtils.createToken(user);
 
             res.cookie('session', token, {
-                httpOnly : false,
+                httpOnly : true,
                 signed : true,
                 sameSite : 'None',
                 path: '/',
-                secure: false,
+                secure: true,
             });
 
             return res.status(200).json({

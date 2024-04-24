@@ -29,17 +29,14 @@ app.use(cors({
   credentials: true
 }));
 
-// No es necesario establecer los headers de CORS manualmente si estás utilizando el middleware `cors`
-// Sin embargo, si decides hacerlo, asegúrate de hacerlo correctamente:
 app.use(function (req, res, next) {
     if (allowedOrigins.includes(req.headers.origin)) {
-        res.header("Access-Control-Allow-Origin", req.headers.origin); // Esta línea permite un origen específico
+        res.header("Access-Control-Allow-Origin", req.headers.origin);
     }
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, PATCH, DELETE");
     next();
 });
-
 
 connectToMongoDB();
 
