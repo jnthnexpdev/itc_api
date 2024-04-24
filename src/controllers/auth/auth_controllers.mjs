@@ -49,7 +49,15 @@ export const loginUser = async(req, res) => {
 
 export const logOutUser = async(req, res) => {
     try{
-        res.cookie('session', '', {expires: new Date(0)});
+        res.cookie('session', '', {
+            path: '/',
+            expires: new Date(0),
+            httpOnly: true,
+            secure: true,
+            signed : true,
+            sameSite: 'None'
+        });
+
         return res.status(200).json({
             success : true,
             message : 'Sesion cerrada'
