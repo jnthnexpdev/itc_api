@@ -1,0 +1,69 @@
+export const generateStatistics = async(req, res) => {
+    try{    
+        const group = await groupModel.findById(req.params.id);
+        if(!group){
+            return res.status(404).json({
+                success : false,
+                message : 'Grupo no encontrado'
+            });
+        }
+
+        const students = await studentsModel.findById(group.listaAlumnos);
+        if(!students){
+            return res.status(404).json({
+                success : false,
+                message : 'El grupo no tiene alumnos registrados'
+            });
+        }
+        //Total de alumnos
+        const studentsTotal = students.alumnos.length;
+        //Todos los promedios finales
+        const finalAverageList = students.alumnos.map(student => student.promedioFinal);
+        //Suma de los promedios finales
+        const sumFinalAverage = finalAverageList.reduce((acum, prom) => acum + prom, 0);
+        //Promedio final grupal
+        const finalAverageGroup = sumFinalAverage / studentsTotal;
+        //Arreglo del promedio general de cada unidad
+        const unitAverages = {};
+        let reprobados = 0;
+
+        // Iteramos sobre cada alumno
+        students.alumnos.forEach(student => {
+            // Iteramos sobre las calificaciones de cada alumno
+            student.calificaciones.forEach(calificacion => {
+                const unidad = calificacion.unidad;
+                const promedioUnidad = calificacion.promedioUnidad;
+
+                if(promedioUnidad < 70){
+                    reprobados++;
+                }
+            
+                // Si la unidad aún no está en el objeto unitAverages, la inicializamos
+                if (!unitAverages.hasOwnProperty(unidad)) {
+                    unitAverages[unidad] = [];
+                }
+            
+                // Añadimos el promedio de la unidad al arreglo correspondiente
+                unitAverages[unidad].push(promedioUnidad);
+            });
+        });
+
+        // Calculamos el promedio de cada unidad
+        for (const unidad in unitAverages) {
+            const promedios = unitAverages[unidad];
+            const sumPromedios = promedios.reduce((acum, promedio) => acum + promedio, 0);
+            const promedioUnitario = sumPromedios / promedios.length;
+            unitAverages[unidad] = promedioUnitario.toFixed(2);
+        }
+
+        return res.status(200).json({
+            success : true,
+            finalAverageGroup : finalAverageGroup.toFixed(2),
+            unitAverages: unitAverages,
+            reprobados : reprobados
+        });
+
+    }catch(error){
+        handleServerError(res, error);
+    }
+}
