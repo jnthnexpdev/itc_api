@@ -24,7 +24,7 @@ export const loginUser = async(req, res) => {
             const { token } = await userUtils.createToken(user);
 
             res.cookie('session', token, {
-                httpOnly : true,
+                httpOnly : false,
                 signed : true,
                 sameSite : 'None',
                 path: '/',
@@ -52,7 +52,7 @@ export const logOutUser = async(req, res) => {
         res.cookie('session', '', {
             path: '/',
             expires: new Date(0),
-            httpOnly: true,
+            httpOnly: false,
             secure: true,
             signed : true,
             sameSite: 'None'
